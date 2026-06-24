@@ -1,20 +1,22 @@
-# FastAPI Study
+# hon_bar 🍸
 
-A Spring Boot backend developer's journey learning FastAPI — building a full-stack monorepo with FastAPI + Next.js + PostgreSQL.
+홈바 운영을 위한 반응형 웹 서비스.
+친구들이 취향을 선택하면, 현재 만들 수 있는 칵테일과 위스키를 추천해준다.
 
 ## Stack
 
 | Layer | Tech |
 |-------|------|
 | Backend | FastAPI, SQLAlchemy, Alembic, Pydantic |
-| Frontend | Next.js 15, TypeScript, Tailwind CSS |
+| Frontend | Next.js 15, TypeScript, Tailwind CSS, shadcn/ui |
 | Database | PostgreSQL 16 (Docker) |
+| Auth | JWT (Admin only) |
 | Runtime | Python 3.12, Node.js 20 |
 
 ## Project Structure
 
 ```
-fast_api_study/
+hon_bar/
 ├── apps/
 │   ├── backend/        # FastAPI
 │   └── frontend/       # Next.js
@@ -57,3 +59,5 @@ npm run dev
 ## Docs
 
 - [Conventions](docs/conventions.md)
+- [ERD & Architecture](docs/architecture.md)
+- [API Spec](docs/api-spec.md)
