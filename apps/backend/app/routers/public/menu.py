@@ -7,14 +7,24 @@ from app.models.cocktail import Cocktail
 from app.models.menu_item import MenuItem, MenuItemTag
 from app.models.order import Order, OrderItem
 from app.models.review import Review
+from app.models.tag import Tag
 from app.schemas.cocktail import RecommendRequest, CocktailResponse
 from app.schemas.menu_item import MenuItemResponse
 from app.schemas.order import OrderCreate, OrderResponse
 from app.schemas.review import ReviewCreate, ReviewResponse
+from app.schemas.tag import TagResponse
 from app.services.availability import get_available_cocktails
 from app.services.recommendation import recommend_cocktails
 
 router = APIRouter()
+
+
+@router.get("/tags", response_model=List[TagResponse])
+def list_tags(category: Optional[str] = None, db: Session = Depends(get_db)):
+    query = db.query(Tag)
+    if category:
+        query = query.filter(Tag.category == category)
+    return query.all()
 
 
 @router.get("/cocktails/available", response_model=List[CocktailResponse])

@@ -75,10 +75,12 @@ export default function MainScreen({ guestName, onChangeName }: Props) {
       {/* divider */}
       <p className="text-xs text-muted-foreground mb-4 tracking-widest uppercase">전체 메뉴</p>
 
-      {/* placeholder — menu list will be added next */}
-      <div className="flex-1 flex items-center justify-center">
-        <p className="text-muted-foreground text-sm">메뉴 목록 준비 중</p>
-      </div>
+      <Link href="/menu">
+        <Button variant="ghost" className="w-full justify-between text-sm text-muted-foreground hover:text-foreground">
+          전체 메뉴 보기
+          <span>→</span>
+        </Button>
+      </Link>
     </div>
   );
 }

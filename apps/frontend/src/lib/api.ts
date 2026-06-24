@@ -24,6 +24,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 // ─── Public ──────────────────────────────────────────────
 
 export const publicApi = {
+  listTags: (category?: string) => {
+    const q = category ? `?category=${category}` : "";
+    return request<Tag[]>(`/tags${q}`);
+  },
+
   listMenu: (params?: { tag_id?: string; search?: string }) => {
     const qs = new URLSearchParams();
     if (params?.tag_id) qs.set("tag_id", params.tag_id);
