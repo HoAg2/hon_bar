@@ -2,40 +2,28 @@ import uuid
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
-from app.models.cocktail import AlcoholLevel, GlassType, CocktailMethod
+from app.models.cocktail import Technique, GlassType, AlcoholLevel
 
 
-class IngredientRef(BaseModel):
+class ItemRef(BaseModel):
     id: uuid.UUID
     name: str
 
     model_config = {"from_attributes": True}
 
 
-class CocktailIngredientBase(BaseModel):
-    ingredient_id: uuid.UUID
-    amount: float
-    unit: str
-    is_required: bool = True
-
-
-class CocktailIngredientResponse(BaseModel):
-    id: uuid.UUID
-    ingredient: IngredientRef
-    amount: float
-    unit: str
-    is_required: bool
-
-    model_config = {"from_attributes": True}
-
-
 class CocktailStepBase(BaseModel):
     step_order: int
-    description: str
+    instruction: str
+    item_id: Optional[uuid.UUID] = None
+    amount: Optional[float] = None
+    unit: Optional[str] = None
+    is_required: bool = True
 
 
 class CocktailStepResponse(CocktailStepBase):
     id: uuid.UUID
+    item: Optional[ItemRef] = None
 
     model_config = {"from_attributes": True}
 
@@ -44,22 +32,18 @@ class CocktailBase(BaseModel):
     name: str
     description: Optional[str] = None
     image_url: Optional[str] = None
-    alcohol_level: AlcoholLevel
-    abv: Optional[float] = None
-    base_spirit: Optional[str] = None
+    technique: Technique
     glass_type: GlassType
-    method: CocktailMethod
-    sweetness: int = 3
-    sourness: int = 3
-    bitterness: int = 3
-    body: int = 3
-    freshness: int = 3
-    garnish: Optional[str] = None
+    alcohol_level: AlcoholLevel
+    taste_sweetness: int = 3
+    taste_sourness: int = 3
+    taste_bitterness: int = 3
+    taste_body: int = 3
+    taste_freshness: int = 3
     is_active: bool = True
 
 
 class CocktailCreate(CocktailBase):
-    ingredients: List[CocktailIngredientBase] = []
     steps: List[CocktailStepBase] = []
 
 
@@ -67,25 +51,20 @@ class CocktailUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     image_url: Optional[str] = None
-    alcohol_level: Optional[AlcoholLevel] = None
-    abv: Optional[float] = None
-    base_spirit: Optional[str] = None
+    technique: Optional[Technique] = None
     glass_type: Optional[GlassType] = None
-    method: Optional[CocktailMethod] = None
-    sweetness: Optional[int] = None
-    sourness: Optional[int] = None
-    bitterness: Optional[int] = None
-    body: Optional[int] = None
-    freshness: Optional[int] = None
-    garnish: Optional[str] = None
+    alcohol_level: Optional[AlcoholLevel] = None
+    taste_sweetness: Optional[int] = None
+    taste_sourness: Optional[int] = None
+    taste_bitterness: Optional[int] = None
+    taste_body: Optional[int] = None
+    taste_freshness: Optional[int] = None
     is_active: Optional[bool] = None
-    ingredients: Optional[List[CocktailIngredientBase]] = None
     steps: Optional[List[CocktailStepBase]] = None
 
 
 class CocktailResponse(CocktailBase):
     id: uuid.UUID
-    ingredients: List[CocktailIngredientResponse] = []
     steps: List[CocktailStepResponse] = []
     created_at: datetime
     updated_at: datetime
@@ -98,4 +77,4 @@ class RecommendRequest(BaseModel):
     sourness: Optional[int] = None
     bitterness: Optional[int] = None
     alcohol_level: Optional[AlcoholLevel] = None
-    base_spirit: Optional[str] = None
+    base_item_type_id: Optional[uuid.UUID] = None

@@ -2,50 +2,40 @@ import uuid
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
-from app.models.order import OrderType, OrderStatus
+from app.models.order import OrderStatus
+from app.schemas.menu_item import MenuItemResponse
+
+
+class OrderItemCreate(BaseModel):
+    menu_item_id: uuid.UUID
+    memo: Optional[str] = None
 
 
 class OrderCreate(BaseModel):
     guest_name: str
     memo: Optional[str] = None
+    items: List[OrderItemCreate]
 
 
 class OrderStatusUpdate(BaseModel):
     status: OrderStatus
 
 
-class OrderResponse(BaseModel):
+class OrderItemResponse(BaseModel):
     id: uuid.UUID
-    order_type: OrderType
-    item_id: uuid.UUID
-    guest_name: str
-    status: OrderStatus
+    menu_item_id: uuid.UUID
+    menu_item: MenuItemResponse
     memo: Optional[str] = None
-    created_at: datetime
 
     model_config = {"from_attributes": True}
 
 
-class IngredientDetail(BaseModel):
-    name: str
-    amount: float
-    unit: str
-    is_required: bool
+class OrderResponse(BaseModel):
+    id: uuid.UUID
+    guest_name: str
+    status: OrderStatus
+    memo: Optional[str] = None
+    order_items: List[OrderItemResponse] = []
+    created_at: datetime
 
-
-class StepDetail(BaseModel):
-    order: int
-    description: str
-
-
-class CocktailDetail(BaseModel):
-    name: str
-    method: str
-    glass_type: str
-    garnish: Optional[str] = None
-    ingredients: List[IngredientDetail] = []
-    steps: List[StepDetail] = []
-
-
-class OrderDetailResponse(OrderResponse):
-    cocktail: Optional[CocktailDetail] = None
+    model_config = {"from_attributes": True}
