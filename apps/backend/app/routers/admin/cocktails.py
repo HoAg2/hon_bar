@@ -1,6 +1,7 @@
 import uuid
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.dependencies import get_current_admin
@@ -30,7 +31,11 @@ def create_cocktail(body: CocktailCreate, db: Session = Depends(get_db), _=Depen
     for step in body.steps:
         db.add(CocktailStep(cocktail_id=cocktail.id, **step.model_dump()))
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Cocktail '{body.name}' already exists")
     db.refresh(cocktail)
     return cocktail
 
@@ -66,7 +71,11 @@ def update_cocktail(cocktail_id: uuid.UUID, body: CocktailUpdate, db: Session = 
         for step in body.steps:
             db.add(CocktailStep(cocktail_id=cocktail.id, **step.model_dump()))
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Cocktail name already exists")
     db.refresh(cocktail)
     return cocktail
 

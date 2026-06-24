@@ -1,6 +1,7 @@
 import uuid
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.dependencies import get_current_admin
@@ -19,7 +20,11 @@ def list_ingredients(db: Session = Depends(get_db), _=Depends(get_current_admin)
 def create_ingredient(body: IngredientCreate, db: Session = Depends(get_db), _=Depends(get_current_admin)):
     ingredient = Ingredient(**body.model_dump())
     db.add(ingredient)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Ingredient '{body.name}' already exists")
     db.refresh(ingredient)
     return ingredient
 
@@ -39,7 +44,11 @@ def update_ingredient(ingredient_id: uuid.UUID, body: IngredientUpdate, db: Sess
         raise HTTPException(status_code=404, detail="Ingredient not found")
     for key, value in body.model_dump(exclude_none=True).items():
         setattr(ingredient, key, value)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Ingredient '{body.name}' already exists")
     db.refresh(ingredient)
     return ingredient
 

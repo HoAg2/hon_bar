@@ -25,7 +25,7 @@ class Ingredient(Base):
     __tablename__ = "ingredients"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     category: Mapped[IngredientCategory] = mapped_column(SAEnum(IngredientCategory), nullable=False)
     quantity: Mapped[float] = mapped_column(Float, default=0.0)
     unit: Mapped[str] = mapped_column(String(20), nullable=False)
