@@ -1,8 +1,20 @@
+# Python
 .env
 __pycache__/
 *.pyc
 *.pyo
 .venv/
 venv/
+
+# Node
+node_modules/
+.next/
+.turbo/
+dist/
+
+# IDE
 .idea/
+.vscode/
+
+# OS
 .DS_Store
