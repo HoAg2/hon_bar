@@ -4,15 +4,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.cocktail import Cocktail
-from app.models.item import StockStatus
-from app.models.item_type import ItemType
-from app.models.menu_item import MenuItem
+from app.models.menu_item import MenuItem, MenuItemTag
 from app.models.order import Order, OrderItem
+from app.models.review import Review
 from app.schemas.cocktail import RecommendRequest, CocktailResponse
 from app.schemas.menu_item import MenuItemResponse
 from app.schemas.order import OrderCreate, OrderResponse
 from app.schemas.review import ReviewCreate, ReviewResponse
-from app.models.review import Review
 from app.services.availability import get_available_cocktails
 from app.services.recommendation import recommend_cocktails
 
@@ -39,11 +37,28 @@ def recommend(body: RecommendRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/menu", response_model=List[MenuItemResponse])
-def list_menu(item_type_id: Optional[uuid.UUID] = None, db: Session = Depends(get_db)):
+def list_menu(
+    tag_id: Optional[uuid.UUID] = None,
+    search: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
     query = db.query(MenuItem).filter(MenuItem.is_active == True)
-    if item_type_id:
-        query = query.filter(MenuItem.item.has(item_type_id=item_type_id))
+    if tag_id:
+        query = query.filter(MenuItem.tags.any(MenuItemTag.tag_id == tag_id))
+    if search:
+        query = query.filter(
+            MenuItem.display_name.ilike(f"%{search}%") |
+            MenuItem.short_description.ilike(f"%{search}%")
+        )
     return query.order_by(MenuItem.display_order).all()
+
+
+@router.get("/menu/{menu_item_id}", response_model=MenuItemResponse)
+def get_menu_item(menu_item_id: uuid.UUID, db: Session = Depends(get_db)):
+    menu_item = db.get(MenuItem, menu_item_id)
+    if not menu_item or not menu_item.is_active:
+        raise HTTPException(status_code=404, detail="MenuItem not found")
+    return menu_item
 
 
 @router.post("/orders", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
