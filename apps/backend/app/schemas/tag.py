@@ -1,11 +1,11 @@
 import uuid
-from typing import Optional
 from pydantic import BaseModel
 
 
 class TagBase(BaseModel):
     category: str
     name: str
+    display_name: str
 
 
 class TagCreate(TagBase):
